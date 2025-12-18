@@ -1,0 +1,100 @@
+# Configuration générale
+data:
+  raw_path: "data/raw/df_time_series.csv"
+  processed_path: "data/processed/"
+  reduction_rate: 0.2  # Taux d'échantillonnage pour données sans VA
+  
+# Split train/test
+split:
+  test_date: "2025-07-01"
+  validation_size: 0.15
+
+# Features temporelles
+features:
+  calendar_events:
+    soldes_hiver:
+      debut_mois: 1
+      debut_jour: 8
+      fin_mois: 2
+      fin_jour: 4
+      intensite: 3
+    frenchdays_printemps:
+      debut_mois: 4
+      debut_jour: 30
+      fin_mois: 5
+      fin_jour: 7
+      intensite: 1
+    soldes_ete:
+      debut_mois: 6
+      debut_jour: 26
+      fin_mois: 7
+      fin_jour: 23
+      intensite: 3
+    frenchdays_rentree:
+      debut_mois: 9
+      debut_jour: 24
+      fin_mois: 9
+      fin_jour: 30
+      intensite: 1
+    pre_blackfriday:
+      debut_mois: 11
+      debut_jour: 3
+      fin_mois: 11
+      fin_jour: 17
+      intensite: 2
+    black_friday:
+      debut_mois: 11
+      debut_jour: 21
+      fin_mois: 12
+      fin_jour: 2
+      intensite: 4
+    periode_noel:
+      debut_mois: 12
+      debut_jour: 3
+      fin_mois: 12
+      fin_jour: 24
+      intensite: 3
+  
+  lag_windows: [1, 7, 14, 28, 56, 365]
+  rolling_windows: [7, 14, 28, 60]
+  
+# Target encoding
+encoding:
+  smoothing: 10
+  min_samples: 100
+
+# Modèle LightGBM
+model:
+  params:
+    objective: "regression"
+    metric: ["mae", "rmse"]
+    boosting_type: "gbdt"
+    num_leaves: 127
+    max_depth: 8
+    min_child_samples: 100
+    min_split_gain: 0.01
+    learning_rate: 0.03
+    n_estimators: 5000
+    subsample: 0.8
+    subsample_freq: 1
+    colsample_bytree: 0.8
+    reg_alpha: 1.0
+    reg_lambda: 1.0
+    random_state: 42
+    n_jobs: -1
+    verbose: -1
+  
+  early_stopping_rounds: 50
+  feature_selection_threshold: 0.98  # Garder features jusqu'à 98% importance
+  top_n_features: [80, 150]  # [min, max]
+
+# Chemins de sortie
+output:
+  model_path: "models/lightgbm_model.pkl"
+  artifacts_path: "artifacts/"
+  predictions_path: "data/predictions/"
+  
+# Logging
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"

@@ -1,0 +1,68 @@
+# Configuration légère pour tests rapides et développement
+# Utiliser: python scripts/train.py --config config/config_light.yaml
+
+data:
+  raw_path: "data/raw/df_time_series.csv"
+  processed_path: "data/processed/"
+  reduction_rate: 0.1  # Plus agressif (10% au lieu de 20%)
+  
+split:
+  test_date: "2025-07-01"
+  validation_size: 0.15
+
+# Features simplifiées
+features:
+  calendar_events:
+    black_friday:  # Seulement Black Friday pour tests
+      debut_mois: 11
+      debut_jour: 21
+      fin_mois: 12
+      fin_jour: 2
+      intensite: 4
+    soldes_hiver:
+      debut_mois: 1
+      debut_jour: 8
+      fin_mois: 2
+      fin_jour: 4
+      intensite: 3
+  
+  lag_windows: [1, 7, 28]  # Moins de lags
+  rolling_windows: [7, 28]  # Moins de rolling
+  
+encoding:
+  smoothing: 10
+  min_samples: 100
+
+# Modèle léger
+model:
+  params:
+    objective: "regression"
+    metric: ["mae"]
+    boosting_type: "gbdt"
+    num_leaves: 31           # Réduit (vs 127)
+    max_depth: 6             # Réduit (vs 8)
+    min_child_samples: 100
+    min_split_gain: 0.01
+    learning_rate: 0.05      # Plus rapide (vs 0.03)
+    n_estimators: 1000       # Beaucoup moins (vs 5000)
+    subsample: 0.8
+    subsample_freq: 1
+    colsample_bytree: 0.8
+    reg_alpha: 1.0
+    reg_lambda: 1.0
+    random_state: 42
+    n_jobs: -1
+    verbose: -1
+  
+  early_stopping_rounds: 30  # Plus court (vs 50)
+  feature_selection_threshold: 0.95  # Plus sélectif (vs 0.98)
+  top_n_features: [50, 100]  # Moins de features (vs [80, 150])
+
+output:
+  model_path: "models/lightgbm_model_light.pkl"
+  artifacts_path: "artifacts/light/"
+  predictions_path: "data/predictions/"
+  
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"''
