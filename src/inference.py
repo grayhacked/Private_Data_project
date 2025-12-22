@@ -148,8 +148,12 @@ class ModelPredictor:
             DataFrame avec prédictions
         """
         logger.info(f"Chargement des données depuis {filepath}...")
-        #df = pd.read_csv(filepath)
-        df = pd.read_parquet(filepath)
+        if filepath.endswith('.csv'):
+            df = pd.read_csv(filepath)
+        elif filepath.endswith('.parquet'):
+            df = pd.read_parquet(filepath)
+        else:
+            raise ValueError("Unsupported file format. Please provide a CSV or Parquet file.")
         
         # Prédictions
         results = self.predict(df)
